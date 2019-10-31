@@ -1,6 +1,9 @@
 var jwt = require('jsonwebtoken');
 checkToken=(req,res,next)=>{
-    var bearerHeader = req.body.token;
+   //
+   // console.log(req);
+    var bearerHeader = req.headers.headers||req.params.headers;
+    // console.log(bearerHeader);
     req.authenticated = false;
     if (bearerHeader){
         jwt.verify(bearerHeader, 'secret', function (err, decoded){
@@ -11,6 +14,7 @@ checkToken=(req,res,next)=>{
                 next();
             } else {
                 req.decoded = decoded;
+              //  console.log(decoded);
                 req.authenticated = true;
                 next();
             }

@@ -1,15 +1,38 @@
 const userModel = require('../models/userModel');
 var nodemailer = require('nodemailer');
-
+var mail=require("../util/mail")
 class UserService {
     register(body, callback) {
-        userModel.create(body, (err, data) => {
+        userModel.register(body, (err, data) => {
             if (err) {
                 callback(err)
             } else {
+                var payload = {
+                    email: body.email
+                };
+                var result = mail.generateToken(payload);
+                let url = 'http://localhost:3000/#!/login/' + result;
+                console.log(result);
+                mail.sendLink(url);
+                console.log("service",data);
                 callback(null, data)
             }
         })
+    }
+    isEmail(object){
+        return new Promise((resolve,reject)=>{
+        
+  var initPromise=userModel.isEmail(object);
+  initPromise.then((data)=>
+  { 
+      console.log(data);
+      resolve(data);
+
+  }).catch((err)=>{
+      reject(err);
+  })
+
+        })    
     }
 
     login(body, callback) {
@@ -23,38 +46,38 @@ class UserService {
         })
     }
 
-    forgot(body, callback) {
+    // forgot(body, callback) {
         
-        userModel.forgot(body, (err, data) => {
-            if (err) {
-                callback(err)
-            } else {
-                callback(null, data);
-            }
-        })
-    }
+    //     userModel.forgot(body, (err, data) => {
+    //         if (err) {
+    //             callback(err)
+    //         } else {
+    //             callback(null, data);
+    //         }
+    //     })
+    // }
 
-    update(body,callback)
-    {
-        userModel.updateToken(body,(err,data)=>{
-            if (err) {
-                callback(err)
-            } else {
+    // update(body,callback)
+    // {
+    //     userModel.updateToken(body,(err,data)=>{
+    //         if (err) {
+    //             callback(err)
+    //         } else {
 
-                callback(null, data);
-            }
-        })
-    }
+    //             callback(null, data);
+    //         }
+    //     })
+    // }
 
-    reset(body,callback)
-    {
-        userModel.reset(body,(err,data)=>{
-            if (err)             
-                callback(err)
-            else
-                callback(null, data);
-        })
-    }
+    // reset(body,callback)
+    // {
+    //     userModel.reset(body,(err,data)=>{
+    //         if (err)             
+    //             callback(err)
+    //         else
+    //             callback(null, data);
+    //     })
+    // }
 
     sendLink(url,req)
     {
@@ -82,16 +105,16 @@ class UserService {
         });
     }
 
-    getallUsers(body,callback)
-    {
-        userModel.getallUsers(body,(err,data)=>
-        {
-            if(err)
-                callback(err)
-            else
-                callback(null,data)
-        })
-    }
-}
+//     getallUsers(body,callback)
+//     {
+//         userModel.getallUsers(body,(err,data)=>
+//         {
+//             if(err)
+//                 callback(err)
+//             else
+//                 callback(null,data)
+//         })
+//     }
+ }
 
 module.exports = new UserService();
