@@ -4,7 +4,7 @@ let jwt = require('jsonwebtoken');
 
 sendLink = (url,req) =>
 {
-  //console.log(url);
+  console.log(url);
 
   var transporter = nodemailer.createTransport({
     service: 'gmail',

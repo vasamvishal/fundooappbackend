@@ -1,7 +1,8 @@
 require('dotenv').config();
 const service = require('../services/userService');
 const mail = require('../util/mail');
-
+const config1=require("../config/databaseConfig");
+const validUrl=require("valid-url");
 class UserController {
     register(req, res) 
     {
@@ -38,6 +39,30 @@ class UserController {
                      
    }
 
+   shorten(req,res)
+   {
+
+  const { longUrl } = req.body;
+  const baseUrl = config1.port;
+  console.log(baseUrl);
+  //Check base url
+  if (validUrl.isUri(baseUrl)) {
+       service.shortn({longUrl},(err,result)=>
+       {
+           if(err)
+           {
+               res.status(200).send(err);
+           }
+           else
+           {
+               res.status(420).send(result);
+           }
+       })
+   }
+   else{
+    return res.status(401).json('Invalid base url');
+  }
+   }
           
 
     

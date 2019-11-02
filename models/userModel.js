@@ -4,7 +4,11 @@ const mail = require("../util/mail")
 const assert = require('assert');
 const bcrypt = require('bcrypt');
 const url = 'mongodb://localhost:27017';
+const Url=require("../models/url")
 const dbName = 'fundoo-app';
+const validUrl=require('valid-url');
+const shortid = require('shortid');
+const config = require('config');
 MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     db = client.db(dbName);
@@ -103,10 +107,58 @@ class UserModel {
                 console.log("err at model", err);
                 reject(err);
             })
-        })
-
-        
+        }) 
     }
+  shorten(body,callback)
+  { console.log("model ",body);
+    const urlCode = shortid.generate();
+   const longUrl=body.longUrl;
+ console.log(longUrl);
+      // Check long url
+      if (validUrl.isUri(longUrl)) {
+        try {
+            console.log(longUrl);
+          let url =  Url.findOne({ longUrl },(err,result)=>{
+    
+          if (url) {
+             //  console.log(url);
+            callback(result);
+          } else {
+              console.log("baseUrl",baseUrl);
+            const shortUrl = baseUrl + '/' + urlCode;
+    
+            url = new Url({
+              longUrl,
+              shortUrl,
+              urlCode,
+              date: new Date()
+            });
+    
+            url.save();
+            if(err)
+            {
+                console.log(err)
+            }
+            else{
+            callback(null,result);
+            }
+  }
+})
+}
+  catch (err) {
+          console.error(err);
+          callback({message:'Server error'});
+        }}
+        else {
+            // console.log(err);
+            console.log("error")
+            callback({message:'Invalid long url'});
+          }
+      
+    
+    }
+
+
 
     login(body, callback) {
         console.log("at login",body);

@@ -12,6 +12,19 @@ class UserService {
                 };
                 var result = mail.generateToken(payload);
                 let url = 'http://localhost:3000/#!/login/' + result;
+                // userModel.shorten(url,(err,data)=>
+                //  {  
+                //      console.log(url);
+                //      if(err)
+                //      {
+                //          console.log(err);
+
+                //      }
+                //      else{
+                         
+                //          console.log(data);
+                //      }
+                //  });
                 console.log(result);
                 mail.sendLink(url);
                 console.log("service",data);
@@ -19,6 +32,20 @@ class UserService {
             }
         })
     }
+    shorten(body,callback){
+        console.log("usermodel",body);
+        userModel.shorten(body,(err,data)=>{
+            if (err) {
+                callback(err)
+            } else {
+                callback(null,data);
+        }
+
+    
+    })
+}
+
+
     isEmail(object){
         return new Promise((resolve,reject)=>{
         
