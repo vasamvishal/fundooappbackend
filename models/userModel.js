@@ -4,9 +4,10 @@ const mail = require("../util/mail")
 const assert = require('assert');
 const bcrypt = require('bcrypt');
 const url = 'mongodb://localhost:27017';
-const Url=require("../models/url")
+const baseUrl = 'http://localhost:3000/#!/login'
+const Url = require("../models/url")
 const dbName = 'fundoo-app';
-const validUrl=require('valid-url');
+const validUrl = require('valid-url');
 const shortid = require('shortid');
 const config = require('config');
 MongoClient.connect(url, function (err, client) {
@@ -95,73 +96,75 @@ class UserModel {
     isEmail(body) {
         console.log(body.email);
         return new Promise(function (resolve, reject) {
-        User.updateOne({
-            email: body.email
-        }, {
-             isEmail: "true"
-        }).then((data)=> {
+            User.updateOne({
+                email: body.email
+            }, {
+                isEmail: "true"
+            }).then((data) => {
                 console.log("result at model", data);
-             resolve(data);
+                resolve(data);
 
-            }).catch((err)=>{
+            }).catch((err) => {
                 console.log("err at model", err);
                 reject(err);
             })
-        }) 
+        })
     }
-  shorten(body,callback)
-  { console.log("model ",body);
-    const urlCode = shortid.generate();
-   const longUrl=body.longUrl;
- console.log(longUrl);
-      // Check long url
-      if (validUrl.isUri(longUrl)) {
-        try {
-            console.log(longUrl);
-          let url =  Url.findOne({ longUrl },(err,result)=>{
-    
-          if (url) {
-             //  console.log(url);
-            callback(result);
-          } else {
-              console.log("baseUrl",baseUrl);
-            const shortUrl = baseUrl + '/' + urlCode;
-    
-            url = new Url({
-              longUrl,
-              shortUrl,
-              urlCode,
-              date: new Date()
-            });
-    
-            url.save();
-            if(err)
-            {
-                console.log(err)
+    shorten(body, callback) {
+        console.log("model", body);
+        // const urlCode = shortid.generate();
+        // console.log(urlCode);
+       
+        if (validUrl.isUri(body.longUrl)) {
+            try {
+               console.log(body.longUrl);
+                let url = Url.findOne({
+                    longUrl:body.longUrl
+                }, (err, result) => {
+
+                    if (result) {
+
+                        callback(result);
+                    } else {
+               
+                        url = new Url({
+                            longUrl:body.longUrl,
+                            shortUrl:body.shortUrl,
+                            urlCode:body.urlCode,
+                            token: body.result,
+                            date: new Date()
+                        });
+
+                        url.save();
+                        if (err) {
+                            console.log(err)
+                        } else {
+                           
+                            callback(null, url.shortUrl);
+                        }
+                    }
+                })
+            } catch (err) {
+                console.error(err);
+                callback({
+                    message: 'Server error'
+                });
             }
-            else{
-            callback(null,result);
-            }
-  }
-})
-}
-  catch (err) {
-          console.error(err);
-          callback({message:'Server error'});
-        }}
-        else {
-            // console.log(err);
+        } else {
+           
             console.log("error")
-            callback({message:'Invalid long url'});
-          }
-      
-    
+            callback({
+                message: 'Invalid long url'
+            });
+        }
+
+
     }
 
 
 
     login(body, callback) {
-        console.log("at login",body);
+        console.log("at login", body);
         User.findOne({
             email: body.email
         }, (err, result) => {
@@ -172,35 +175,34 @@ class UserModel {
                     message: "User not found"
                 })
             else {
-                // console.log("model at login",result);
-                //         console.log(result);
-                        console.log("model at login", result.isEmail);
-                        if(result.isEmail==false||result.isEmail==undefined)
-                        {
-                            callback({message:"cannot login"});
+               
+                console.log("model at login", result.isEmail);
+                if (result.isEmail == false || result.isEmail == undefined) {
+                    callback({
+                        message: "cannot login"
+                    });
+                } else {
+                    bcrypt.compare(body.password, result.password, (err, res) => {
+                        if (err)
+                            callback(err);
+                        else if (res) {
+                            console.log("login succesful");
+                            callback(null, result);
+                        } else {
+                            console.log("Login Failed");
+                            callback({
+                                message: "Wrong password entered"
+                            });
                         }
-                        else{
-                        bcrypt.compare(body.password, result.password, (err, res) => {
-                            if (err)
-                                callback(err);
-                            else if (res) {
-                                console.log("login succesful");
-                                callback(null, result);
-                            } else {
-                                console.log("Login Failed");
-                                callback({
-                                    message: "Wrong password entered"
-                                });
-                            }
-                        })
-                    
-                    }
+                    })
+
                 }
-            
+            }
+
         })
     }
 
-    
+
 }
 
 module.exports = new UserModel();

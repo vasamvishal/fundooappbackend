@@ -27,8 +27,8 @@ app.use(expressValidator())
 
 
 app.use('/',route)
-app.use('/',require("../backend/routes/index"));
-app.use('/api/url',require("../backend/routes/url"));
+//app.use('/',require("../backend/routes/index"));
+//app.use('/api/url',require("../backend/routes/url"));
 const config = require('./config/databaseConfig');
 const mongoose = require('mongoose');
 
@@ -57,6 +57,7 @@ const connectDB = async () => {
 //     process.exit();
 // });
 
-server.listen('3000', () => {
+server.listen(config.port1, () => {
     console.log("Server is listening on port 3000");
 });
+module.exports = server
