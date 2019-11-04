@@ -1,0 +1,24 @@
+{
+    
+    "login":[{
+        "Empty":{"email":"","password":""},
+        "missing":{"email":""},
+        "properEntery":{"email":"ganesh12@gmail.com","password":"123456"},
+        "notregisteredentry":{"email":"jitu@gmail.com","password":"123456"},
+        "missingpaswword":{"email":"vishalvasam12@gmail.com","password":"12345"},
+        "wrongentry":{"email":"vishalvasam12@gmail.com","password":"12345"}
+    }],
+    
+    "register":[{
+        "Empty":{"firstName":"","lastName":"","email":"","password":""},
+        "missing":{"firstName":" "},
+        "missinglastName":{"lastName":" "},
+        "missingemail":{"email":" "},
+        "missingpassword":{"password":" "},
+                                          
+        "properEntery":{"firstName":"ganesh","lastName":"rahul","email":"ravi@gmail.com","password":"123456"},
+        "registeredentry":{"firstName":"vishal","lastName":"rahul","email":"ganesh12@gmail.com","password":"123456"},
+        "wrongpassword":{"firstName":"vishal","lastName":"rahul","email":"vishalvasam12@gmail.com","password":"12345"},
+        "wrongemail":{"firstName":"vishal","lastName":"rahul","email":"vishalvasam12@gm7ail.com","password":"12345"}
+    }]
+}
