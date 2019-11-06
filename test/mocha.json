@@ -3,6 +3,7 @@
     "login":[{
         "Empty":{"email":"","password":""},
         "missing":{"email":""},
+        "isemailfalse":{"email":"gg@gmail.com","password":"123456"},
         "properEntery":{"email":"ganesh12@gmail.com","password":"123456"},
         "notregisteredentry":{"email":"jitu@gmail.com","password":"123456"},
         "missingpaswword":{"email":"vishalvasam12@gmail.com","password":"12345"},

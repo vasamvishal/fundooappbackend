@@ -30,7 +30,7 @@ checkToken = (req, res, next) => {
                         next();
                     } else {
                         req.decoded = decoded;
-                        //  console.log(decoded);
+                          console.log(decoded);
                         req.authenticated = true;
                         next();
                     }

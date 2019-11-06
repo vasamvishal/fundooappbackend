@@ -1,9 +1,8 @@
 require('dotenv').config();
 const service = require('../services/userService');
 const mail = require('../util/mail');
-// const config1 = require("../config/databaseConfig");
-// const validUrl = require("valid-url");
-
+var redis = require("redis"),
+    client = redis.createClient();
 class UserController {
     register(req, res) {
         req.check('email', 'Invalid email').isEmail();
@@ -16,7 +15,6 @@ class UserController {
                 errors: errors
             })
         }
-
         service.register(req.body, (err, data) => {
             if (err) {
                 res.status(422).send(err);
@@ -38,30 +36,37 @@ class UserController {
                     if (err) {
                         console.log(err);
                     } else {
-
                         console.log(result);
                     }
-
                 })
                 res.status(200).send(data);
             }
         })
     }
+    uploaddata(req, res) {
+        console.log("req");
+        var promise = new Promise((resolve, reject) => {
+            service.upload(req, res)
+            promise.then((data) => {
+                    res.status(200).send(data);
+                })
+                .catch((err) => {
+                    res.status(422).send(err);
+                })
+
+        })
+    }
+
     async isEmail(req, res) {
         var promise = await service.isEmail(req.body);
         console.log("controller", promise);
         if (promise) {
             res.status(200).send(promise);
-
         } else {
             res.status(422).send(err);
         }
-
     }
-
-
     login(req, res) {
-      
         req.check('email', 'Invalid email').isEmail();
         req.check('password', 'Invalid password').isLength({
             min: 6
@@ -72,25 +77,29 @@ class UserController {
                 errors: errors
             })
         }
-      
-
+        let responseResult = {};
         console.log(req.body);
         let result = {
-
             email: req.body.email,
             password: req.body.password
         }
         console.log(result);
         service.login(result, (err, data) => {
             if (data) {
-                res.status(200).send(data);
-
+                responseResult.sucess = true;
+                // responseResult.result = result;
+                responseResult.message = "login succesfully";
+                res.status(200).send(responseResult);
             } else {
-                res.status(422).send(err);
+                responseResult.sucess = false;
+                responseResult.errors = err;
+                res.status(422).send(responseResult);
             }
-
         })
     }
+
+
+
 
     //     forgot(req, res) 
     //     {

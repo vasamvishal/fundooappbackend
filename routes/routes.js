@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const userControl = require('../controllers/userController');
-//const chatControl = require('../controllers/chatController')
+const service = require('../services/userService')
 const auth = require('../auth/auth');
-
+var multer=require("../aws/file-upload")
+const tokenverify=require("../auth/token")
 router.post('/register', userControl.register);
  router.post('/login',userControl.login);
  router.post('/isemail',auth.checkToken,userControl.isEmail);
+ router.post('/imageupload',tokenverify.Token,multer.upload.single('image'),userControl.uploaddata);
 // router.post('/reset',auth.checkToken,userControl.reset);
 // router.get('/dashboard',userControl.getallUsers);
 // router.post('/sendMsg',chatControl.sendMsgControl);

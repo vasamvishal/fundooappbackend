@@ -51,6 +51,17 @@ describe('Login Api',() => {
             })
     })
 
+    it('if isemail is false',(done) => {
+        chai.request(server)
+            .post('/login')
+            .send(readJson.login[0].isemailfalse)
+            .end((req,res) => {
+                res.should.have.status(422);
+                res.body.should.be.a('object');
+                done()
+            })
+    })
+
     it('if password is wrong',(done) => {
         chai.request(server)
             .post('/login')
@@ -73,13 +84,13 @@ describe('Login Api',() => {
             })
     })
 
-    it('if everything is right',(done) => {
+    it('if not registered entry',(done) => {
         chai.request(server)
             .post('/login')
             .send(readJson.login[0].notregisteredentry)
             .end((req,res) => {
                 res.should.have.status(422);
-                res.body.should.be.a('object').eql({message:"User not found"});
+                res.body.should.be.a('object').eql({"errors":{message:"User not found"},"sucess":false});
                 done()
             })
     })
