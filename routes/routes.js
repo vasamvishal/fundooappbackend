@@ -8,8 +8,9 @@ const tokenverify=require("../auth/token")
 router.post('/register', userControl.register);
  router.post('/login',userControl.login);
  router.post('/isemail',auth.checkToken,userControl.isEmail);
+ router.post('/forgot',userControl.forgot);
  router.post('/imageupload',tokenverify.Token,multer.upload.single('image'),userControl.uploaddata);
-// router.post('/reset',auth.checkToken,userControl.reset);
+  router.post('/reset',tokenverify.Token,userControl.reset);
 // router.get('/dashboard',userControl.getallUsers);
 // router.post('/sendMsg',chatControl.sendMsgControl);
 // router.get('/getMsg',chatControl.getMsgControl);
