@@ -21,5 +21,26 @@
         "registeredentry":{"firstName":"vishal","lastName":"rahul","email":"ganesh12@gmail.com","password":"123456"},
         "wrongpassword":{"firstName":"vishal","lastName":"rahul","email":"vishalvasam12@gmail.com","password":"12345"},
         "wrongemail":{"firstName":"vishal","lastName":"rahul","email":"vishalvasam12@gm7ail.com","password":"12345"}
+    }],
+    "forgot":[{
+       
+        "missingemail":{"email":" "},
+         "improperemail":{"email":"vishalgmail.com"},
+         "notregisteredemail":{"email":"ganesh1256@gmail.com"},
+        "registeredentry":{"email":"ganesh12@gmail.com"}
+        
+    }],
+
+    "reset":[{
+       
+        "missingemail":{"email":" "},
+        "missingpassword":{"email":"abc@gmail.com","password":" "},
+        "missingnewpassword":{"email":"abc@gmail.com","password_new":" "},
+         "improperemail":{"email":"vishalgmail.com"},
+         "improperpassword1":{"email":"ganesh12@gmail.com","password":"1234567","password_new":"12345678"},
+         "improperpasswordnew":{"email":"ganesh12@gmail.com","password":"1234567","password_new":"12345"},
+         "notregisteredemail":{"email":"ganesh1256@gmail.com"},
+        "everythingisperfect":{"email":"ganesh12@gmail.com","password":"123456","password_new":"12345678"}
+        
     }]
 }
