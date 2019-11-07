@@ -1,10 +1,6 @@
 var jwt = require('jsonwebtoken');
-var request = require("request");
 var url = require("../models/url");
-checkToken = (req, res, next) => {
-    //
-    // console.log(req);
-
+checkToken = (req, next) => {
 
     var urlcode = req.headers.headers || req.params.headers;
     console.log(urlcode);
@@ -19,6 +15,7 @@ checkToken = (req, res, next) => {
 
               var bearerHeader=result.token;
               console.log(bearerHeader);
+              console.log(result);
 
             req.authenticated = false;
             if (bearerHeader) {

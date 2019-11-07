@@ -135,12 +135,15 @@ class UserModel {
                         token: body.result,
                         date: new Date()
                     });
-                    url.save();
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        callback(null, url.shortUrl);
-                    }
+                    url.save((err, result) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log(result);
+                            callback(null, result);
+                        }
+                    })
+
                 }
             })
         } catch (err) {
@@ -257,9 +260,7 @@ class UserModel {
                     console.log("error", error);
                     callback(error);
                 } else if (data)
-                    callback(null, {
-                        message: "Updated successfully"
-                    });
+                    callback(null, data);
             })
         } catch (err) {
             console.log("err at set model", err)

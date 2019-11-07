@@ -1,8 +1,8 @@
 const userModel = require('../models/userModel');
-var nodemailer = require('nodemailer');
+
 var mail = require("../util/mail")
 var shortid = require('shortid');
-var config1 = require("../config/databaseConfig");
+
 var validUrl = require('valid-url');
 var redis = require("redis");
 var redis1 = require('../services/redisserver');
@@ -28,18 +28,20 @@ class UserService {
     }
     shorten(req, callback) {
         try {
+            console.log(req);
             console.log("service", req);
             const longUrl = req.email;
             console.log(longUrl);
-            const baseUrl = config1.port;
+            const baseUrl = req.baseurl;
             console.log(baseUrl);
             const result = req.result;
+            console.log(result);
             //Check base url
             if (validUrl.isUri(longUrl)) {
                 if (validUrl.isUri(baseUrl)) {
                     const urlCode = shortid.generate();
-                    console.log(urlCode);
-                    console.log(urlCode);
+                    console.log("service url code", urlCode);
+                    // console.log(urlCode);
                     const shortUrl = baseUrl + '/' + urlCode;
                     console.log("shortUrl", shortUrl);
                     var req1 = {
@@ -54,8 +56,8 @@ class UserService {
                             console.log(err);
                             callback(err);
                         } else {
-                            console.log(result);
-                            mail.sendLink(result);
+                            console.log("result at service", result);
+                            mail.sendLink(result.shortUrl);
                             console.log(result);
                             callback(null, result);
                         }
@@ -142,7 +144,6 @@ class UserService {
                 }
             });
 
-
             userModel.login(body, (err, result) => {
                 if (err) {
                     callback(err)
@@ -153,20 +154,36 @@ class UserService {
                             message: "cannot login"
                         });
                     } else {
+                        console.log(body.password);
+                        console.log(result.password);
                         bcrypt.compare(body.password, result.password, (err, res) => {
-                            if (err)
-                                callback(err);
-                            else if (res) {
-                                console.log("login succesful");
-                                callback(null, result);
+                            if (err) {
+                                console.log(err);
+                                callback(err)
+                            } else if(res==false){
+                                console.log("ttttt", res);
+                                callback({message:"enter proper password"});
                             }
+                                else{
+                                  callback(null,result);
+                                }
+                            
                         })
                     }
                 }
-            });
+            })
         } catch (err) {
             console.log("err at login service", err)
         }
+    }
+    updateToken(req, callback) {
+        userModel.updateToken(req, (err, data) => {
+            if (err) {
+                callback(err)
+            } else {
+                callback(null, data);
+            }
+        })
     }
     forgot(body, callback) {
         try {
@@ -175,28 +192,13 @@ class UserService {
                 if (err) {
                     callback(err);
                 } else {
-                    let payload = {
-                            email: data.email
-                        },
-                        result = mail.generateToken(payload),
-                        req = {
-                            email: body.email,
-                            verify_token: result
-                        }
-                    userModel.updateToken(req, (err, data) => {
-                        console.log(result);
-                        let url = 'http://localhost:3000/#!/reset/' + result;
-                        mail.sendLink(url, payload);
-                        if (err) {
-                            console.log(err);
-                            callback(err);
-                        } else {
-                            callback(null, data);
-                        }
-                    })
+                    
+                    callback(null, data);
                 }
             })
-        } catch (err) {
+        }
+       
+        catch (err) {
             console.log("err at register service", err)
         }
     }
@@ -206,10 +208,12 @@ class UserService {
                 if (err)
                     callback(err)
                 else {
+                    console.log("service result",result);
                     bcrypt.compare(body.password_old, result.password, (err, res) => {
                         if (err)
                             callback(err);
-                        else if (res) {
+                        else if (res==true) {
+                            console.log("res at",res);
                             bcrypt.hash(body.password_new, 10, (err, hash) => {
                                 if (err)
                                     throw err;
@@ -232,6 +236,11 @@ class UserService {
                                     })
                                 }
                             })
+                        }
+                        else if(res==false)
+                        {
+                            console.log(res);
+                            callback({message:"please enter correct password"});
                         }
                     })
                 }

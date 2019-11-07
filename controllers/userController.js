@@ -3,6 +3,7 @@ const service = require('../services/userService');
 const mail = require('../util/mail');
 var redis = require("redis"),
     client = redis.createClient();
+var config1 = require("../config/databaseConfig")
 class UserController {
 
     register(req, res) {
@@ -27,8 +28,11 @@ class UserController {
                         email: data.email
                     };
                     var result = mail.generateToken(payload);
-                    let email = 'http://localhost:3000/#!/login/' + result;
+                    let urlemail = config1.port;
+                    let email = urlemail + result;
+                    console.log(result);
                     let url = {
+                        baseurl: config1.port,
                         email,
                         result
                     }
@@ -84,7 +88,7 @@ class UserController {
             }).isAlphanumeric();
             const errors = req.validationErrors();
             if (errors) {
-                return res.status(422).json({
+                return res.status(422).send({
                     errors: errors
                 })
             }
@@ -94,17 +98,19 @@ class UserController {
                 email: req.body.email,
                 password: req.body.password
             }
-            console.log(result);
             service.login(result, (err, data) => {
-                if (data) {
-                    responseResult.sucess = true;
-                    // responseResult.result = result;
-                    responseResult.message = "login succesfully";
-                    res.status(200).send(responseResult);
-                } else {
+                console.log(err);
+                console.log("data ctrl", data);
+                console.log("result abxdfvgxsfgfctrl", result);
+                if (err) {
                     responseResult.sucess = false;
-                    responseResult.errors = err;
-                    res.status(422).send(responseResult);
+                    // responseResult.result = result;
+                    responseResult.message = "not login succesfully";
+                    res.status(420).send(responseResult);
+                } else if (data) {
+                    responseResult.sucess = true;
+                    responseResult.message = data;
+                    res.status(200).send(responseResult);
                 }
             })
         } catch (err) {
@@ -121,6 +127,7 @@ class UserController {
                     errors: errors
                 });
 
+
             service.forgot(req.body, (err, data) => {
                 if (err)
                     res.status(422).send(err);
@@ -128,9 +135,44 @@ class UserController {
                     if (err) {
                         console.log(err);
                     } else {
-                        res.status(200).send(data);
+                        console.log(data);
+
+                        let payload = {
+                                email: data.email
+                            },
+                            result = mail.generateToken(payload);
+                        let urlemail = config1.port2
+                        let email = urlemail + result;
+                        console.log(email);
+                        let req1 = {
+                            baseurl: config1.port2,
+                            email,
+                            result
+                        }
+                        service.shorten(req1, (err, result) => {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("shorten url", result);
+                                result = {
+                                    verify_token: result.urlCode,
+                                    email: data.email
+                                }
+                                service.updateToken(result, (err, data) => {
+                                    if (err) {
+                                        res.status(200).send(err);
+                                    } else {
+                                        res.status(200).send({
+                                            message: "succesfully updated"
+                                        });
+                                    }
+                                })
+                            }
+                        })
+
+
                     }
-                };
+                }
             })
         } catch (err) {
             console.log("err at controller forgot", err)
@@ -157,7 +199,7 @@ class UserController {
             console.log(result);
             service.reset(result, (err, data) => {
                 if (err) {
-                    console.log("error in con 99--", err);
+                    // console.log("error in con 99--", err);
                     res.status(422).send(err);
                 } else
                     res.status(200).send(data);

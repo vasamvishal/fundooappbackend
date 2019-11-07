@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
-var url = require("../models/url");
-Token = (req, res, next) => {
+
+Token = (req, next) => {
     var bearerHeader = req.headers.headers || req.params.headers;
     console.log(bearerHeader);
     req.authenticated = false;
